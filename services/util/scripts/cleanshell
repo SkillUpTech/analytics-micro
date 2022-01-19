@@ -1,0 +1,14 @@
+#!/bin/bash
+# Acts as a shell which cleans temporary files after each invocation.
+
+set -e
+
+[[ -n "${CLEANSHELL_NO_DEBUG}" ]] || set -x
+
+: ${CLEANSHELL_DIRS:='/var/lib/apt/lists /tmp /var/tmp'}
+
+eval "$@"
+
+for tmpdir in ${CLEANSHELL_DIRS}; do
+    [[ ! -d "${tmpdir}" ]] || find "${tmpdir}" -type f -delete
+done
