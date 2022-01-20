@@ -15,12 +15,26 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
+  nginx:
+    image: ${REGISTRY}/web/nginx
+    volumes:
+    - ./mnt/nginx/conf.d:/etc/nginx/nginx.conf.d
+    ports:
+    - "80:80"
+
+  mysql:
+    image: ${REGISTRY}/web/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+
   namenode:
     image: ${REGISTRY}/hadoop/hdfs
     restart: unless-stopped
     volumes:
       - hdfs_data:/home/hadoop/var
-      - config_data:/home/hadoop/config
+      - ${CONFIGS_PATH}:/home/hadoop/config
     command: hdfs-entrypoint.sh namenode
   
   datanode:
@@ -28,7 +42,7 @@ services:
     restart: unless-stopped
     volumes:
       - hdfs_data:/home/hadoop/var
-      - config_data:/home/hadoop/config
+      - ${CONFIGS_PATH}:/home/hadoop/config
     command: hdfs-entrypoint.sh datanode
 
   spark:
@@ -53,11 +67,6 @@ services:
       - SPARK_SSL_ENABLED=no
 
 volumes:
-  config_data:
-    driver_opts:
-      type: none
-      device: ${AM_CONFIGS_PATH}
-      o: bind
   hdfs_data:
   hive_data:
   elasticsearch_data:

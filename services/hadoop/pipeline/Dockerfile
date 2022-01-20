@@ -1,0 +1,1 @@
+FROM skt-pub.azurecr.io/analytics-micro/hadoop/base
