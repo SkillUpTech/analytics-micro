@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: elasticsearch:1.5.2
+    environment:
+      - cluster.name=analyticstack
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - TAKE_FILE_OWNERSHIP=1
+    restart: unless-stopped
+    expose:
+      - "9200"
+      - "9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  namenode:
+    image: ${REGISTRY}/hadoop/hdfs
+    restart: unless-stopped
+    volumes:
+      - hdfs_data:/home/hadoop/var
+      - config_data:/home/hadoop/config
+    command: hdfs-entrypoint.sh namenode
+  
+  datanode:
+    image: ${REGISTRY}/hadoop/hdfs
+    restart: unless-stopped
+    volumes:
+      - hdfs_data:/home/hadoop/var
+      - config_data:/home/hadoop/config
+    command: hdfs-entrypoint.sh datanode
+
+  spark:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+
+  spark-worker:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+
+volumes:
+  config_data:
+    driver_opts:
+      type: none
+      device: ${AM_CONFIGS_PATH}
+      o: bind
+  hdfs_data:
+  hive_data:
+  elasticsearch_data:

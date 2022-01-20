@@ -1,0 +1,4 @@
+#!/bin/bash
+# Sync /var/config-originals to /var/config non-destructively.
+
+rsync --ignore-existing --verbose --archive "$HOME"/config-originals "$HOME"/config

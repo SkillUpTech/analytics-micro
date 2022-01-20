@@ -1,26 +1,22 @@
-ARG HADOOP_MIRROR=https://dlcdn.apache.org/hadoop/common \
-    HADOOP_VERSION=hadoop-3.3.1
+ARG UTIL_IMAGE=skt-pub.azurecr.io/analytics-micro/util
 
-###### hadoop-common
-FROM skt-pub.azurecr.io/analytics-micro/util AS hadoop-common
-
-RUN apt-get -y update && apt-get -y install gnupg2 wget
-
-ARG HADOOP_MIRROR HADOOP_VERSION
-RUN cd /opt \
-    && wget --no-verbose https://dlcdn.apache.org/hadoop/common/KEYS \
-    && gpg --import KEYS \
-    && tgz=${HADOOP_VERSION}.tar.gz \
-    && url=${HADOOP_MIRROR}/${HADOOP_VERSION}/${tgz} \
-    && wget --no-verbose ${url} ${url}.asc \
-    && gpg --verify ${tgz}.asc ${tgz} \
-    && tar -xvzf ${tgz} \
-    && rm ${tgz} ${tgz}.asc KEYS
+###### util
+# Allows us to reference the utility image as 'util' in later stages.
+FROM ${UTIL_IMAGE} AS util
 
 ###### hdfs
 FROM skt-pub.azurecr.io/analytics-micro/hadoop/base AS hdfs
 
-RUN useradd --no-log-init --create-home --shell /bin/bash
+USER root
+RUN apt-get -y update && apt-get -y install rsync
 
-ARG HADOOP_VERSION
-COPY --from=hadoop-common /opt/${HADOOP_VERSION} /home/hdfs/hadoop-common
+USER hadoop
+SHELL [ "/bin/sh", "-c" ]
+
+ENV HDFS_DATA_ROOT=$HOME/var
+RUN mkdir -p "$HDFS_DATA_ROOT"/datanode "$HDFS_DATA_ROOT"/namenode
+
+COPY --from=util --chown=hadoop:hadoop /util/sync-configs /usr/local/bin
+COPY --chown=hadoop:hadoop --chmod=700 ./scripts/hdfs-entrypoint.sh /usr/local/bin/
+
+VOLUME [ "/home/hadoop/var" ]

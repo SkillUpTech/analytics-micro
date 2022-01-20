@@ -1,0 +1,37 @@
+#!/bin/bash
+# Usage:
+#   $ link-conf TARGET NAME
+#
+# TARGET        is a file or directory which should be moved to /var/config and then replaced with a symlink.
+# NAME          is the name by which TARGET should appear within MOUNT_DIR.
+#
+# During the build, TARGET is actually moved to /${HOME}/config-originals/name. Then,
+#       - the original file is linked to $MOUNT_DIR/$NAME, and
+#       - $MOUNT_DIR/$NAME is linked to $HOME/config-originals/name.
+# This allows the original files to be accessed at runtime so they can be synced into the mounted directory,
+# which will initially be empty. Using two symlinks allows us to avoid duplicating the files for this purpose.
+
+set -ex
+
+mount_dir=${HOME}/config
+target="$(realpath "$1")"
+name="$2"
+
+target_parent="$(dirname "${target}")"
+target_name="$(basename "${target}")"
+originals_dir="${HOME}"/config-originals
+originals_loc="${originals_dir}"/"${name}"
+mount_loc="${mount_dir}"/"${name}"
+
+mkdir -p "${originals_dir}"
+mkdir -p "${mount_dir}"
+
+mv "${target}" "${originals_loc}"
+
+pushd "${target_parent}"
+    ln -s "${mount_loc}" "${target_name}"
+popd
+
+pushd "${mount_dir}"
+    ln -s "${originals_loc}" "${name}"
+popd

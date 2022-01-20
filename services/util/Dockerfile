@@ -1,5 +1,3 @@
-FROM ubuntu:bionic
+FROM alpine
 
-COPY --chmod=700 ./scripts/* /usr/local/bin
-
-SHELL [ "/usr/local/bin/cleanshell" ]
+COPY --chmod=700 ./scripts/* /util/
