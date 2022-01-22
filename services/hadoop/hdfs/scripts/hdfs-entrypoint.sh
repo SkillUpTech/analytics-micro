@@ -10,5 +10,4 @@ if [[ ! -f "$formatted_marker" ]]; then
     yes | hadoop "${node_type}" -format && touch "$formatted_marker"
 fi
 
-sync-configs
 hdfs "${node_type}" "${@:2}"

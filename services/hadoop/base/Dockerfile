@@ -1,6 +1,8 @@
 ARG HADOOP_MIRROR=https://dlcdn.apache.org/hadoop/common
 ARG HADOOP_VERSION=hadoop-3.3.1
 ARG UTIL_IMAGE=skt-pub.azurecr.io/analytics-micro/util:latest
+ARG UID=1000
+ARG GID=1000
 
 ###### util
 # This lets us reference the utility image as 'util' in later stages.
@@ -28,7 +30,14 @@ FROM ubuntu:bionic AS hadoop
 COPY --from=util /util/cleanshell /usr/local/bin/
 SHELL [ "/usr/local/bin/cleanshell" ]
 
-RUN useradd --no-log-init --create-home --shell /bin/bash hadoop \
+ARG UID GID
+RUN addgroup --gid ${GID} hadoop \
+    && useradd \
+        --no-log-init \
+        --create-home \
+        --shell /bin/bash \
+        --uid ${UID} \
+        --gid ${GID} hadoop \
     && chown hadoop:hadoop /usr/local/bin/*
 
 USER hadoop
@@ -48,8 +57,4 @@ RUN mkdir $HOME/.bashrc.d \
     && echo 'for file in "$HOME"/.bashrc.d/*; do source "${file}"; done' >> "$HOME"/.bashrc
 COPY --chown=hadoop:hadoop ./env/user_vars $HOME/.bashrc.d/
 
-COPY --from=util --chown=hadoop:hadoop /util/link-conf /usr/local/bin/
-RUN mkdir ${HOME}/config \
-    && link-conf ${HADOOP_HOME}/etc/hadoop hadoop-common
-
-COPY --chown=hadoop:hadoop ./config/hadoop-common/* $HOME/config/hadoop-common/
+COPY --chown=hadoop:hadoop ./config/hadoop-common/* ${HADOOP_HOME}/etc/hadoop/

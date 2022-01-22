@@ -1,1 +1,4 @@
 **/.target
+data/
+conf/insights_env
+conf/analytics_api_env

@@ -15,9 +15,11 @@ tag = $(patsubst services/%/.target,$(docker_registry)/%:$(am_version),$@)
 docker_build = cd $(dir $@) && DOCKER_BUILDKIT=1 docker build --tag $(tag) .
 as_targets = $(patsubst %,services/%/.target,$1)
 
+all_services := $(call as_targets,$(hadoop_services)) $(call as_targets,$(openedx_services)) $(call as_targets,$(web_services))
+
 build: $(call as_targets,$(hadoop_services)) $(call as_targets,$(openedx_services)) $(call as_targets,$(web_services))
 
-services/hadoop/base/.target: services/util/.target
+$(all_services): services/util/.target
 
 $(call as_targets,$(hadoop_base_children)): services/hadoop/base/.target
 

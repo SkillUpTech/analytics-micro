@@ -7,9 +7,6 @@ FROM ${UTIL_IMAGE} AS util
 ###### hdfs
 FROM skt-pub.azurecr.io/analytics-micro/hadoop/base AS hdfs
 
-USER root
-RUN apt-get -y update && apt-get -y install rsync
-
 USER hadoop
 SHELL [ "/bin/sh", "-c" ]
 

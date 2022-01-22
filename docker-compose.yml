@@ -18,7 +18,7 @@ services:
   nginx:
     image: ${REGISTRY}/web/nginx
     volumes:
-    - ./mnt/nginx/conf.d:/etc/nginx/nginx.conf.d
+    - ${LOCALDATA}/nginx/conf.d:/etc/nginx/nginx.conf.d
     ports:
     - "80:80"
 
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     volumes:
       - hdfs_data:/home/hadoop/var
-      - ${CONFIGS_PATH}:/home/hadoop/config
+      - ${LOCALDATA}/hadoop:/home/hadoop/config
     command: hdfs-entrypoint.sh namenode
   
   datanode:
@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
     volumes:
       - hdfs_data:/home/hadoop/var
-      - ${CONFIGS_PATH}:/home/hadoop/config
+      - ${LOCALDATA}/hadoop:/home/hadoop/config
     command: hdfs-entrypoint.sh datanode
 
   spark:
