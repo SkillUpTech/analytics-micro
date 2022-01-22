@@ -23,3 +23,5 @@ WORKDIR ${HOME}
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 ENV PATH=$PATH:$HOME/.poetry/bin 
+
+COPY --chown=openedx:openedx --chmod=700 ./scripts/launch-edx-server /usr/local/bin/

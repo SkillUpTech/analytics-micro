@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -ex
-
-source "${EDX_VENV}"/bin/activate
-
-dockerize -template "${CFG_FILE}".template:"${CFG_FILE}"
-
-"${EDX_VENV}"/bin/gunicorn --pythonpath="${EDX_PROJECT_DIR}" -b 127.0.0.1:8080 -w 2 --timeout=300  "${EDX_APPLICATION}".wsgi:application

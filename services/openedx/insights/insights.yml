@@ -1,7 +1,10 @@
 ---
 
-# Values can be overridden arbitrarily by providing values as JSON/YAML in the
-# INSIGHTS_OVERRIDES environment variable.
+# NOTE: Don't edit this file. Use set environment variables in conf/insights_env instead.
+# Values can also be overwritten or added arbitrarily by providing values as JSON/YAML in the
+# $INSIGHTS_OVERRIDES environment variable, in case any of the hard-coded values aren't to
+# your liking.
+
 override_values: &overrides
   {{ .Env.INSIGHTS_OVERRIDES }}
 
