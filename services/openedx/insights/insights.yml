@@ -1,72 +1,70 @@
 ---
-
-# NOTE: Don't edit this file. Use set environment variables in conf/insights_env instead.
-# Values can also be overwritten or added arbitrarily by providing values as JSON/YAML in the
+# NOTE: Don't edit this file. Set environment variables using 'conf/analytics_env' instead.
+# Values can also be overwritten or added arbitrarily by providing values as JSON in the
 # $INSIGHTS_OVERRIDES environment variable, in case any of the hard-coded values aren't to
 # your liking.
 
-override_values: &overrides
-  {{ .Env.INSIGHTS_OVERRIDES }}
+override_values: &overrides {{ .Env.INSIGHTS_OVERRIDES }}
 
 APPLICATION_NAME: Insights
 CACHES:
-    default:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
-        KEY_PREFIX: default_env-default_deployment-insights
-        LOCATION:
-        - memcached:11211
+  default:
+    BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    KEY_PREFIX: default_env-default_deployment-insights
+    LOCATION:
+      - memcached:11211
 CDN_DOMAIN: null
-CMS_COURSE_SHORTCUT_BASE_URL: {{ .Env.CMS_COURSE_SHORTCUT_BASE_URL }}
-COURSE_API_URL: {{ .Env.COURSE_API_URL }}
+CMS_COURSE_SHORTCUT_BASE_URL: 'https://{{ .Env.CMS_BASE_URL }}/home'
+COURSE_API_URL: 'https://{{ .Env.LMS_BASE_URL }}/api/courses/v1'
 CSRF_COOKIE_NAME: insights_csrftoken
 CSRF_COOKIE_SECURE: false
 DATABASES:
-    default:
-        ENGINE: django.db.backends.mysql
-        HOST: mysql
-        NAME: dashboard
-        OPTIONS:
-            connect_timeout: 10
-            init_command: SET sql_mode='STRICT_TRANS_TABLES'
-        PASSWORD: {{ .Env.MYSQL_PASSWORD }}
-        PORT: 3306
-        USER: {{ .Env.MYSQL_USER }}
-DATA_API_AUTH_TOKEN: {{ .Env.DATA_API_AUTH_TOKEN }}
+  default:
+    ENGINE: django.db.backends.mysql
+    HOST: mysql
+    NAME: dashboard
+    OPTIONS:
+      connect_timeout: 10
+      init_command: SET sql_mode='STRICT_TRANS_TABLES'
+    PASSWORD: '{{ .Env.DASHBOARD001_PASSWORD }}'
+    PORT: 3306
+    USER: dashboard001
+DATA_API_AUTH_TOKEN: '{{ .Env.DATA_API_AUTH_TOKEN }}'
 DATA_API_URL: http://analytics-api:8100/api/v0
 DOCUMENTATION_LOAD_ERROR_URL: http://127.0.0.1/en/latest/Reference.html#error-conditions
-EMAIL_HOST: {{ .Env.EMAIL_HOST }}
-EMAIL_HOST_PASSWORD: {{ .Env.EMAIL_HOST_PASSWORD }}
-EMAIL_HOST_USER: {{ .Env.EMAIL_HOST_USER }}
+EMAIL_HOST: '{{ .Env.EMAIL_HOST }}'
+EMAIL_HOST_PASSWORD: '{{ .Env.EMAIL_HOST_PASSWORD }}'
+EMAIL_HOST_USER: '{{ .Env.EMAIL_HOST_USER }}'
 EMAIL_PORT: 587
 ENABLE_AUTO_AUTH: false
-GRADING_POLICY_API_URL: https://{{ .Env.LMS_BASE_URL }}/api/grades/v1/
+GRADING_POLICY_API_URL: 'https://{{ .Env.LMS_BASE_URL }}/api/grades/v1/'
 HELP_URL: http://127.0.0.1/en/latest
 LANGUAGE_CODE: en-us
 LANGUAGE_COOKIE_NAME: insights_language
 LEARNER_API_LIST_DOWNLOAD_FIELDS: null
-LMS_COURSE_SHORTCUT_BASE_URL: https://{{ .Env.LMS_BASE_URL }}/courses
-MODULE_PREVIEW_URL: https://{{ .Env.LMS_BASE_URL }}/xblock
-OPEN_SOURCE_URL: {{ .Env.OPEN_SOURCE_URL }}
+LMS_COURSE_SHORTCUT_BASE_URL: 'https://{{ .Env.LMS_BASE_URL }}/courses'
+MODULE_PREVIEW_URL: 'https://{{ .Env.LMS_BASE_URL }}/xblock'
+OPEN_SOURCE_URL: '{{ .Env.OPEN_SOURCE_URL }}'
 PLATFORM_NAME: edX
 PRIVACY_POLICY_URL: http://example.com/privacy-policy
 RESEARCH_URL: https://www.edx.org/research-pedagogy
-SECRET_KEY: {{ .Env.SECRET_KEY }}
+SECRET_KEY: '{{ .Env.SECRET_KEY }}'
 SEGMENT_IGNORE_EMAIL_REGEX: null
-SEGMENT_IO_KEY: {{ .Env.SEGMENT_IO_KEY }}
+SEGMENT_IO_KEY: '{{ .Env.SEGMENT_IO_KEY }}'
 SESSION_COOKIE_NAME: insights_sessionid
 SESSION_EXPIRE_AT_BROWSER_CLOSE: false
-SOCIAL_AUTH_EDX_OIDC_ID_TOKEN_DECRYPTION_KEY: {{ .Env.SOCIAL_AUTH_EDX_OIDC_SECRET }}
-SOCIAL_AUTH_EDX_OIDC_ISSUER: https://{{ .Env.LMS_BASE_URL }}/oauth2
-SOCIAL_AUTH_EDX_OIDC_KEY: {{ .Env.SOCIAL_AUTH_EDX_OIDC_KEY }}
-SOCIAL_AUTH_EDX_OIDC_LOGOUT_URL: https://{{ .Env.LMS_BASE_URL }}/logout
-SOCIAL_AUTH_EDX_OIDC_SECRET: {{ .Env.SOCIAL_AUTH_EDX_OIDC_SECRET }}
-SOCIAL_AUTH_EDX_OIDC_URL_ROOT: https://{{ .Env.LMS_BASE_URL }}/oauth2
-BACKEND_SERVICE_EDX_OAUTH2_KEY: {{ .Env.BACKEND_SERVICE_EDX_OAUTH2_KEY }}
-BACKEND_SERVICE_EDX_OAUTH2_SECRET: {{ .Env.BACKEND_SERVICE_EDX_OAUTH2_SECRET }}
+SOCIAL_AUTH_EDX_OIDC_ID_TOKEN_DECRYPTION_KEY: '{{ .Env.SOCIAL_AUTH_EDX_OIDC_SECRET }}'
+SOCIAL_AUTH_EDX_OIDC_ISSUER: 'https://{{ .Env.LMS_BASE_URL }}/oauth2'
+SOCIAL_AUTH_EDX_OIDC_KEY: '{{ .Env.SOCIAL_AUTH_EDX_OIDC_KEY }}'
+SOCIAL_AUTH_EDX_OIDC_LOGOUT_URL: 'https://{{ .Env.LMS_BASE_URL }}/logout'
+SOCIAL_AUTH_EDX_OIDC_SECRET: '{{ .Env.SOCIAL_AUTH_EDX_OIDC_SECRET }}'
+SOCIAL_AUTH_EDX_OIDC_URL_ROOT: 'https://{{ .Env.LMS_BASE_URL }}/oauth2'
+BACKEND_SERVICE_EDX_OAUTH2_KEY: '{{ .Env.BACKEND_SERVICE_EDX_OAUTH2_KEY }}'
+BACKEND_SERVICE_EDX_OAUTH2_SECRET: '{{ .Env.BACKEND_SERVICE_EDX_OAUTH2_SECRET }}'
 SOCIAL_AUTH_REDIRECT_IS_HTTPS: false
 STATICFILES_DIRS:
-  - {{ .Env.EDX_PROJECT_DIR }}/{{ .Env.EDX_APPLICATION }}/static
-STATIC_ROOT: {{ .Env.HOME }}/var/staticfiles
+  - '{{ .Env.EDX_PROJECT_DIR }}/{{ .Env.EDX_APPLICATION }}/static'
+STATIC_ROOT: '{{ .Env.HOME }}/var/insights/staticfiles'
 SUPPORT_EMAIL: ''
 TERMS_OF_SERVICE_URL: http://example.com/terms-service
 TIME_ZONE: UTC

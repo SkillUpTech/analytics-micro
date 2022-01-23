@@ -12,7 +12,6 @@ FROM ${UTIL_IMAGE} AS util
 ###### repo
 FROM alpine AS repo
 ARG REPO_HOST REPO_NAME REPO_TAG
-ENV EDX_PROJECT_NAME=edx_analytics_dashboard
 RUN apk add --no-cache git \
     && cd /opt \
     && git clone --depth 1 --branch ${REPO_TAG} ${REPO_HOST}/${REPO_NAME}.git repo \
@@ -36,6 +35,8 @@ COPY --from=repo --chown=hadoop:hadoop /opt/repo/ ${EDX_PROJECT_NAME}/
 ARG SETTINGS_MODULE
 ENV DJANGO_SETTINGS_MODULE=${SETTINGS_MODULE}
 ENV PATH=${HOME}/nodeenvs/insights/bin:${EDX_VENV}/bin:${PATH}
+# TODO Node + static assets
+
 ENV EDX_APPLICATION=analytics_dashboard
 ENV THEME_SCSS=${EDX_PROJECT_DIR}/sass/themes/open-edx.scss
 ENV ANALYTICS_DASHBOARD_CFG=${HOME}/insights.yml
