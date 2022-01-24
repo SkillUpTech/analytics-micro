@@ -1,0 +1,17 @@
+CREATE USER '{{ .Env.READ_ONLY_USER }}'@'%' IDENTIFIED BY '{{ .Env.READ_ONLY_PASSWORD }}';
+GRANT SELECT ON *.* TO '{{ .Env.READ_ONLY_USER }}'@'%';
+
+CREATE USER '{{ .Env.DB_MIGRATION_USER }}'@'%' IDENTIFIED BY '{{ .Env.DB_MIGRATION_PASS }}';
+GRANT ALL PRIVILEGES ON `analytics-api`.* TO '{{ .Env.MIGRATE_USER }}'@'%';
+GRANT ALL PRIVILEGES ON `reports`.* TO '{{ .Env.MIGRATE_USER }}'@'%';
+GRANT ALL PRIVILEGES ON `dashboard`.* TO '{{ .Env.MIGRATE_USER }}'@'%';
+
+CREATE USER 'api001'@'%' IDENTIFIED BY '{{ .Env.MYSQL_API001_PASSWORD }}';
+GRANT ALL PRIVILEGES ON `analytics-api`.* TO 'api001'@'%';
+GRANT SELECT ON `reports`.* TO 'api001'@'%';
+
+CREATE USER 'reports001'@'%' IDENTIFIED BY '{{ .Env.MYSQL_REPORTS001_PASSWORD }}';
+GRANT SELECT ON `reports`.* TO 'reports001'@'%';
+
+CREATE USER 'dashboard001'@'%' IDENTIFIED BY '{{ .Env.MYSQL_DASHBOARD001_PASSWORD }}';
+GRANT ALL PRIVILEGES ON `dashboard`.* TO 'dashboard001'@'%';

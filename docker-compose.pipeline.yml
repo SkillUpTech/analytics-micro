@@ -1,0 +1,49 @@
+services:
+  namenode:
+    image: ${REGISTRY}/hadoop/hdfs
+    restart: unless-stopped
+    volumes:
+      - hdfs_data:/home/hadoop/var
+      - ${LOCALDATA}/hadoop:/home/hadoop/config
+    command: hdfs-entrypoint.sh namenode
+    networks:
+      - analytics-micro-net
+  
+  datanode:
+    image: ${REGISTRY}/hadoop/hdfs
+    restart: unless-stopped
+    volumes:
+      - hdfs_data:/home/hadoop/var
+      - ${LOCALDATA}/hadoop:/home/hadoop/config
+    command: hdfs-entrypoint.sh datanode
+    networks:
+      - analytics-micro-net
+
+  spark:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    networks:
+      - analytics-micro-net
+
+  spark-worker:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    networks:
+      - analytics-micro-net
+
+networks:
+  analytic-micro-net:
+    external: true

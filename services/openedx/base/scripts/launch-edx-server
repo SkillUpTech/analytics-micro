@@ -6,4 +6,14 @@ source "${EDX_VENV}"/bin/activate
 
 dockerize -template "${CFG_FILE}".template:"${CFG_FILE}"
 
+migrate_marker="${MARKER_DIR}"/"${EDX_APPLICATION}".migrations
+
+if [[ -f "${migrate_marker}" ]]; then
+    echo "Migrations already complete for ${EDX_APPLICATION}. Skipping."
+else
+    cd "${EDX_PROJECT_DIR}"
+    make migrate
+    touch "${migrate_marker}"
+fi
+
 "${EDX_VENV}"/bin/gunicorn --pythonpath="${EDX_PROJECT_DIR}" -b 127.0.0.1:"${APPLICATION_PORT}" -w 2 --timeout=300  "${EDX_APPLICATION}".wsgi:application

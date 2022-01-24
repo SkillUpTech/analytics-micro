@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+marker_dir="${HOME}"/marker
+cnf="${HOME}"/.my.cnf
+
+touch "${cnf}"
+chmod 600 "${cnf}"
+cat <<HERE > "${cnf}"
+[client]
+user=root
+password=${MYSQL_ROOT_PASSWORD}
+HERE
+
+if [[ -f "${MARKER_DIR}"/.db_init ]]; then
+    echo "Database already initialized. Skipping."
+else
+    echo "Initializing MYSQL database."
+    dockerize -template ${INIT_DB_TEMPLATE} | mysql
+    touch "${MARKER_DIR}"/.db_init
+fi

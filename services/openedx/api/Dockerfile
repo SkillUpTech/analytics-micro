@@ -24,7 +24,7 @@ COPY ./requirements/* /opt/repo/
 ###### api
 FROM ${EDX_BASE_IMAGE} AS api
 
-ENV EDX_PROJECT_NAME=edx_analytics_api
+ENV EDX_PROJECT_NAME=edx_analytics_data_api
 RUN mkdir ${EDX_PROJECT_NAME}
 COPY --from=repo --chown=hadoop:hadoop /opt/repo/pyproject.toml ${EDX_PROJECT_NAME}/
 COPY --from=repo --chown=hadoop:hadoop /opt/repo/poetry.lock ${EDX_PROJECT_NAME}/

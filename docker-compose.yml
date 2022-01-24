@@ -14,13 +14,17 @@ services:
       - "9300"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - analytics-micro-net
 
   nginx:
     image: ${REGISTRY}/web/nginx
     volumes:
-    - ${LOCALDATA}/nginx/conf.d:/etc/nginx/nginx.conf.d
+      - ${LOCALDATA}/nginx/conf.d:/etc/nginx/nginx.conf.d
     ports:
-    - "80:80"
+      - "80:80"
+    networks:
+      - analytics-micro-net
 
   mysql:
     image: ${REGISTRY}/web/mysql
@@ -28,45 +32,35 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-
-  namenode:
-    image: ${REGISTRY}/hadoop/hdfs
-    restart: unless-stopped
-    volumes:
-      - hdfs_data:/home/hadoop/var
-      - ${LOCALDATA}/hadoop:/home/hadoop/config
-    command: hdfs-entrypoint.sh namenode
+    networks:
+      - analytics-micro-net
   
-  datanode:
-    image: ${REGISTRY}/hadoop/hdfs
-    restart: unless-stopped
+  analytics-api:
+    image: ${REGISTRY}/openedx/api
     volumes:
-      - hdfs_data:/home/hadoop/var
-      - ${LOCALDATA}/hadoop:/home/hadoop/config
-    command: hdfs-entrypoint.sh datanode
+      - openedx_marker:/home/openedx/marker
+    networks:
+      - analytics-micro-net
 
-  spark:
-    image: docker.io/bitnami/spark:3
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-
-  spark-worker:
-    image: docker.io/bitnami/spark:3
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
+  insights:
+    image: ${REGISTRY}/openedx/insights
+    volumes:
+      - openedx_marker:/home/openedx/marker
+    networks:
+      - analytics-micro-net
+  
+  db-worker:
+    image: ${REGISTRY}/openedx/database-worker
+    volumes:
+      - openedx_marker:/home/openedx/marker
+    networks:
+      - analytics-micro-net
 
 volumes:
   hdfs_data:
   hive_data:
   elasticsearch_data:
+  openedx_marker:
+
+networks:
+  analytics-micro-net:

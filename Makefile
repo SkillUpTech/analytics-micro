@@ -8,7 +8,7 @@ web_services := web/mysql web/nginx
 hadoop_base_children := hadoop/hdfs hadoop/pipeline
 
 # Services which depend on openedx/base
-openedx_base_children := openedx/api openedx/insights
+openedx_base_children := openedx/api openedx/insights openedx/migration-worker
 
 # Macros
 tag = $(patsubst services/%/.target,$(docker_registry)/%:$(am_version),$@)
