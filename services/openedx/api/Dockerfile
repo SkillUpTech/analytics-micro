@@ -2,15 +2,14 @@ ARG REPO_HOST=https://github.com/SkillUpTech
 ARG REPO_NAME=edx-analytics-data-api
 ARG REPO_TAG=skt-ironwood/0.1.2
 ARG SETTINGS_MODULE=analytics_api.settings.production
-ARG UTIL_IMAGE=skt-pub.azurecr.io/analytics-micro/util:latest
-ARG EDX_BASE_IMAGE=skt-pub.azurecr.io/analytics-micro/openedx/base
+ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
 
 ###### util
 # This lets us reference the utility image as 'util' in later stages.
-FROM ${UTIL_IMAGE} AS util
+FROM ${REGISTRY}/util:latest AS util
 
 ###### repo
-FROM alpine AS repo
+FROM alpine:latest AS repo
 ARG REPO_HOST REPO_NAME REPO_TAG
 RUN apk add --no-cache git \
     && cd /opt \
@@ -22,7 +21,7 @@ COPY ./requirements/* /opt/repo/
 # FIXME Correct pyproject.toml in repo
 
 ###### api
-FROM ${EDX_BASE_IMAGE} AS api
+FROM ${REGISTRY}/openedx/base AS api
 
 ENV EDX_PROJECT_NAME=edx_analytics_data_api
 RUN mkdir ${EDX_PROJECT_NAME}
