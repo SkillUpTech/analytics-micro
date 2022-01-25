@@ -44,7 +44,7 @@ ENV THEME_SCSS=${EDX_PROJECT_DIR}/sass/themes/open-edx.scss
 ENV ANALYTICS_API_CFG=${HOME}/analytics_api.yml
 ENV CFG_FILE=${ANALYTICS_DASHBOARD_CFG}
 
-COPY ./analytics_api.yml ${CFG_FILE}.template
+COPY ./templates/analytics_api.yml ${CFG_FILE}.template
 COPY --from=util --chown=openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
 
 ENV APPLICATION_PORT=8100

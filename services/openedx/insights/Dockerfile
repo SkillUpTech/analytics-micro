@@ -22,8 +22,7 @@ FROM ${REGISTRY}/openedx/base:latest AS insights
 
 ENV EDX_PROJECT_NAME=edx_analytics_dashboard
 RUN mkdir ${EDX_PROJECT_NAME}
-COPY --from=repo --chown=hadoop:hadoop /opt/repo/pyproject.toml ${EDX_PROJECT_NAME}/
-COPY --from=repo --chown=hadoop:hadoop /opt/repo/poetry.lock ${EDX_PROJECT_NAME}/
+COPY --chown=hadoop:hadoop ./requirements/* ${EDX_PROJECT_NAME}/
 
 ENV EDX_PROJECT_DIR=${HOME}/${EDX_PROJECT_NAME}
 ENV EDX_VENV=${HOME}/venv
@@ -41,7 +40,7 @@ ENV THEME_SCSS=${EDX_PROJECT_DIR}/sass/themes/open-edx.scss
 ENV ANALYTICS_DASHBOARD_CFG=${HOME}/insights.yml
 ENV CFG_FILE=${ANALYTICS_DASHBOARD_CFG}
 
-COPY ./insights.yml ${CFG_FILE}.template
+COPY --chown=openedx:openedx ./templates/insights.yml ${CFG_FILE}.template
 COPY --from=util --chown=openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
 
 ENV APPLICATION_PORT=8110
