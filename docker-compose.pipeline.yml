@@ -45,5 +45,8 @@ services:
       - analytics-micro-net
 
 networks:
-  analytic-micro-net:
+  analytics-micro-net:
     external: true
+
+volumes:
+  hdfs_data:

@@ -8,7 +8,7 @@ web_services := web/mysql web/nginx
 hadoop_base_children := hadoop/hdfs hadoop/pipeline
 
 # Services which depend on openedx/base
-openedx_base_children := openedx/api openedx/insights openedx/migration-worker
+openedx_base_children := openedx/api openedx/insights openedx/database-worker
 
 # Macros
 tag = $(patsubst services/%/.target,$(docker_registry)/%:$(am_version),$@)
@@ -16,7 +16,7 @@ docker_build = cd $(dir $@) && DOCKER_BUILDKIT=1 docker build --tag $(tag) .
 as_targets = $(patsubst %,services/%/.target,$1)
 
 # Convenience variables
-all_services := $(call as_targets,$(hadoop_services)) $(call as_targets,$(openedx_services)) $(call as_targets,$(web_services))
+all_services := $(call as_targets,$(hadoop_services) $(openedx_services) $(web_services))
 
 SHELL := /bin/bash
 
@@ -32,7 +32,7 @@ help:
 	@echo "make dev       Equivalent to running 'build' then 'init'"
 
 init:
-	find conf/ -type f -name '*.template' -exec sh -c 'set -x; cp --no-clobber -- $$0 $${0%.template}' '{}' \;
+	find conf/ -type f -name '*.template' -exec sh -xc 'cp --no-clobber -- $$1 $${1%.template}' 'make-init' '{}' \;
 
 up:
 	docker-compose up --detach
@@ -43,7 +43,7 @@ logs:
 
 dev: build init
 
-build: $(call as_targets,$(hadoop_services)) $(call as_targets,$(openedx_services)) $(call as_targets,$(web_services))
+build: $(all_services)
 
 $(all_services): services/util/.target
 

@@ -1,12 +1,12 @@
 ARG HADOOP_MIRROR=https://dlcdn.apache.org/hadoop/common
 ARG HADOOP_VERSION=hadoop-3.3.1
-ARG UTIL_IMAGE=skt-pub.azurecr.io/analytics-micro/util:latest
-ARG UID=1000
-ARG GID=1000
+ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG UID=1001
+ARG GID=1001
 
 ###### util
 # This lets us reference the utility image as 'util' in later stages.
-FROM ${UTIL_IMAGE} AS util
+FROM ${REGISTRY}/util:latest AS util
 
 ###### hadoop-common
 FROM alpine AS hadoop-common
@@ -48,13 +48,16 @@ COPY --from=openjdk:8 ${JAVA_HOME} ${JAVA_HOME}
 ENV PATH="$PATH:$JAVA_HOME/bin"
 
 ARG HADOOP_VERSION
-ENV HOME=/home/hadoop \
-    HADOOP_HOME=/home/hadoop/${HADOOP_VERSION}
+ENV HOME=/home/hadoop
+ENV HADOOP_HOME=/home/hadoop/${HADOOP_VERSION}
 ENV PATH=${PATH}:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin
+
 COPY --from=hadoop-common --chown=hadoop:hadoop /opt/${HADOOP_VERSION} ${HADOOP_HOME}
 
 RUN mkdir $HOME/.bashrc.d \
     && echo 'for file in "$HOME"/.bashrc.d/*; do source "${file}"; done' >> "$HOME"/.bashrc
-COPY --chown=hadoop:hadoop ./env/user_vars $HOME/.bashrc.d/
 
+COPY --from=util --chown=hadoop:hadoop --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
+COPY --chown=hadoop:hadoop ./env/user_vars /tmp
+RUN dockerize -template /tmp/user_vars:$HOME/.bashrc.d/user_vars
 COPY --chown=hadoop:hadoop ./config/hadoop-common/* ${HADOOP_HOME}/etc/hadoop/

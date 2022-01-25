@@ -32,6 +32,8 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - "mysql_data:/var/lib/mysql"
     networks:
       - analytics-micro-net
   
@@ -57,10 +59,11 @@ services:
       - analytics-micro-net
 
 volumes:
-  hdfs_data:
-  hive_data:
   elasticsearch_data:
+  mysql_data:
   openedx_marker:
+  insights_static:
+  api_static:
 
 networks:
   analytics-micro-net:

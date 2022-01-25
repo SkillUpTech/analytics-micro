@@ -1,11 +1,11 @@
-ARG UTIL_IMAGE=skt-pub.azurecr.io/analytics-micro/util
+ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
 
 ###### util
 # Allows us to reference the utility image as 'util' in later stages.
-FROM ${UTIL_IMAGE} AS util
+FROM ${REGISTRY}/util:latest AS util
 
 ###### hdfs
-FROM skt-pub.azurecr.io/analytics-micro/hadoop/base AS hdfs
+FROM ${REGISTRY}/hadoop/base:latest AS hdfs
 
 USER hadoop
 SHELL [ "/bin/sh", "-c" ]
