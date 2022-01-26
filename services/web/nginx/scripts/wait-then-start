@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+dockerize -wait tcp://insights:8110 -wait tcp://analytics-api:8100
+
+echo "Replacing current process with the Nginx Docker entrypoint." >&2
+exec /docker-entrypoint.sh "$@"

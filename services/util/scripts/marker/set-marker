@@ -6,8 +6,8 @@
 # Mark MARKER as done (true/1).
 
 
-# Wait for the mysql service:
-dockerize -wait tcp://mysql:3306
+echo "Waiting for the mysql server." >&2
+dockerize -wait tcp://mysql:3306 -timeout 20s > /dev/null 2>&1
 
 cat <<HERE > /tmp/mysql_util.cnf
 [client]

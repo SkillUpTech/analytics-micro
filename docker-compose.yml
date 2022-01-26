@@ -23,8 +23,11 @@ services:
     volumes:
       - ${LOCALDATA}/ssl/certs:/etc/ssl/certs:ro
       - ${LOCALDATA}/ssl/private:/etc/ssl/private:ro
+    env_file:
+      - conf/analytics.env
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - analytics-micro-net
 
