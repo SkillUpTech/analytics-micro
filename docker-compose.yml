@@ -21,7 +21,8 @@ services:
     image: ${REGISTRY}/web/nginx
     restart: unless-stopped
     volumes:
-      - ${LOCALDATA}/nginx/conf.d:/etc/nginx/nginx.conf.d
+      - ${LOCALDATA}/ssl/certs:/etc/ssl/certs:ro
+      - ${LOCALDATA}/ssl/private:/etc/ssl/private:ro
     ports:
       - "80:80"
     networks:

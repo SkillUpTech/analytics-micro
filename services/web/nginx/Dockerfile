@@ -1,3 +1,4 @@
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
-
 FROM nginx
+
+COPY ./templates/* /etc/nginx/templates/
+VOLUME [ "/etc/ssl/certs", "/etc/ssl/private" ]
