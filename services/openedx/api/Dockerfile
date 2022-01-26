@@ -42,7 +42,7 @@ ENV PATH=${HOME}/nodeenvs/analytics_api/bin:${EDX_VENV}/bin:${PATH}
 ENV EDX_APPLICATION=analytics_dashboard
 ENV THEME_SCSS=${EDX_PROJECT_DIR}/sass/themes/open-edx.scss
 ENV ANALYTICS_API_CFG=${HOME}/analytics_api.yml
-ENV CFG_FILE=${ANALYTICS_DASHBOARD_CFG}
+ENV CFG_FILE=${ANALYTICS_API_CFG}
 
 COPY ./templates/analytics_api.yml ${CFG_FILE}.template
 COPY --from=util --chown=openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/

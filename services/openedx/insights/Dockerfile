@@ -1,7 +1,7 @@
 ARG REPO_HOST=https://github.com/SkillUpTech
 ARG REPO_NAME=edx-analytics-dashboard
 ARG REPO_TAG=skt-ironwood/0.1.1
-ARG SETTINGS_MODULE=analytics_dashboard.settings.production
+ARG SETTINGS_MODULE=analytics_dashboard.settings.analytics_micro
 ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
 
 ###### util
@@ -31,7 +31,6 @@ RUN cd ${EDX_PROJECT_NAME} && virtualenv ${EDX_VENV} && . ${EDX_VENV}/bin/activa
 COPY --from=repo --chown=hadoop:hadoop /opt/repo/ ${EDX_PROJECT_NAME}/
 
 ARG SETTINGS_MODULE
-ENV DJANGO_SETTINGS_MODULE=${SETTINGS_MODULE}
 ENV PATH=${HOME}/nodeenvs/insights/bin:${EDX_VENV}/bin:${PATH}
 # TODO Node + static assets
 
@@ -41,8 +40,10 @@ ENV ANALYTICS_DASHBOARD_CFG=${HOME}/insights.yml
 ENV CFG_FILE=${ANALYTICS_DASHBOARD_CFG}
 
 COPY --chown=openedx:openedx ./templates/insights.yml ${CFG_FILE}.template
+COPY --chown=openedx:openedx ./settings/analytics_micro.py ${EDX_PROJECT_NAME}/${EDX_APPLICATION}/settings/
 COPY --from=util --chown=openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
 
+ENV DJANGO_SETTINGS_MODULE=analytics_dashboard.settings.analytics_micro
 ENV APPLICATION_PORT=8110
 EXPOSE ${APPLICATION_PORT}
 # ENTRYPOINT [ "/usr/local/bin/launch-edx-server" ]

@@ -66,7 +66,8 @@ STATICFILES_DIRS:
   - '{{ .Env.EDX_PROJECT_DIR }}/{{ .Env.EDX_APPLICATION }}/static'
 STATIC_ROOT: '{{ .Env.HOME }}/var/insights/staticfiles'
 SUPPORT_EMAIL: ''
-TERMS_OF_SERVICE_URL: http://example.com/terms-service
+TERMS_OF_SERVICE_URL: 'https://{{ .Env.LMS_BASE_URL }}.com/terms-service'
 TIME_ZONE: UTC
+CONTAINER_LOG_LEVEL: '{{ .Env.LOG_LEVEL }}'
 
 <<: *overrides
