@@ -85,5 +85,6 @@ STATICFILES_DIRS:
 STATICFILES_STORAGE: django.contrib.staticfiles.storage.StaticFilesStorage
 STATIC_ROOT: '{{ .Env.HOME }}/var/analytics_api/staticfiles'
 TIME_ZONE: UTC
+CONTAINER_LOG_LEVEL: '{{ .Env.LOG_LEVEL }}'
 
 <<: *overrides

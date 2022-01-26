@@ -1,7 +1,6 @@
 ARG REPO_HOST=https://github.com/SkillUpTech
 ARG REPO_NAME=edx-analytics-dashboard
 ARG REPO_TAG=skt-ironwood/0.1.1
-ARG SETTINGS_MODULE=analytics_dashboard.settings.analytics_micro
 ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
 
 ###### util
@@ -30,7 +29,6 @@ RUN cd ${EDX_PROJECT_NAME} && virtualenv ${EDX_VENV} && . ${EDX_VENV}/bin/activa
 
 COPY --from=repo --chown=hadoop:hadoop /opt/repo/ ${EDX_PROJECT_NAME}/
 
-ARG SETTINGS_MODULE
 ENV PATH=${HOME}/nodeenvs/insights/bin:${EDX_VENV}/bin:${PATH}
 # TODO Node + static assets
 

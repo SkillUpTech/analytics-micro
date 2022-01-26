@@ -1,4 +1,10 @@
 CREATE DATABASE IF NOT EXISTS `analytics-micro-marker`;
+CREATE DATABASE IF NOT EXISTS `analytics-api`;
+CREATE DATABASE IF NOT EXISTS `reports`;
+CREATE DATABASE IF NOT EXISTS `dashboard`;
+CREATE DATABASE IF NOT EXISTS `edx_hive_metastore`;
+
+
 CREATE USER IF NOT EXISTS 'analytics-micro-util'@'%' IDENTIFIED WITH mysql_native_password BY '{{ .Env.UTILITY_USER_PASSWORD }}';
 GRANT ALL ON `analytics-micro-marker`.* TO 'analytics-micro-util'@'%';
 
@@ -20,13 +26,13 @@ GRANT SELECT ON `reports`.* TO 'reports001'@'%';
 CREATE USER IF NOT EXISTS 'dashboard001'@'%' IDENTIFIED WITH mysql_native_password BY '{{ .Env.MYSQL_DASHBOARD001_PASSWORD }}';
 GRANT ALL ON `dashboard`.* TO 'dashboard001'@'%';
 
-CREATE DATABASE IF NOT EXISTS `edx_hive_metastore`;
+
 CREATE USER IF NOT EXISTS '{{ .Env.HIVE_METASTORE_DATABASE_USER }}'@'%' IDENTIFIED WITH mysql_native_password BY '{{ .Env.HIVE_MATASTORE_DATABASE_PASSWORD }}';
 GRANT ALL ON `edx_hive_metastore`.* TO '{{ .Env.HIVE_METASTORE_DATABASE_USER }}'@'%';
 
 USE `analytics-micro-marker`;
 CREATE TABLE IF NOT EXISTS marker(
-    `id` VARCHAR(20) NOT NULL,
+    `id` VARCHAR(50) NOT NULL,
     `done` BOOLEAN NOT NULL,
     PRIMARY KEY ( `id` )
 );
