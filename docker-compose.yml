@@ -64,18 +64,6 @@ services:
     depends_on:
       - mysql
       - analytics-api
-  
-  db-worker:
-    image: ${REGISTRY}/openedx/database-worker
-    env_file:
-      - conf/analytics.env
-      - conf/mysql.env
-    volumes:
-      - openedx_marker:/home/openedx/marker
-    networks:
-      - analytics-micro-net
-    depends_on:
-      - mysql
 
 volumes:
   elasticsearch_data:

@@ -41,7 +41,8 @@ ENV CFG_FILE=${ANALYTICS_DASHBOARD_CFG}
 
 COPY --chown=openedx:openedx ./templates/insights.yml ${CFG_FILE}.template
 COPY --chown=openedx:openedx ./settings/analytics_micro.py ${EDX_PROJECT_NAME}/${EDX_APPLICATION}/settings/
-COPY --from=util --chown=openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
+COPY --from=util --chown=openedx:openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
+COPY --from=util --chown=openedx:openedx --chmod=700 /util/marker/* /usr/local/bin/
 
 ENV DJANGO_SETTINGS_MODULE=analytics_dashboard.settings.analytics_micro
 ENV APPLICATION_PORT=8110

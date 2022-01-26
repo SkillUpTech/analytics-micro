@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Usage:
+#   check-marker MARKER
+#
+# Exit codes:
+#   0 if a row with id='MARKER' exists in the marker table and is set to true/1, 
+#   1 if it is set to false/0 or does not exist.
+
+
+# Wait for the mysql service:
+dockerize -wait tcp://mysql:3306
+
+cat <<HERE > /tmp/mysql_util.cnf
+[client]
+user=analytics-micro-util
+password=${UTILITY_USER_PASSWORD}
+host=mysql
+port=3306
+HERE
+
+query() {
+    mysql --defaults-extra-file=/tmp/mysql_util.cnf analytics-micro-marker -sNe "$@"
+}
+
+echo "Checking marker $1." >&2
+
+result=$(query "SELECT done FROM marker WHERE id = '$1'")
+
+echo "Marker $1 is set to ${result}." >&2
+
+exit $(( ! $(( ${result} )) ))

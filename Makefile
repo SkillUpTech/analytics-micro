@@ -50,7 +50,7 @@ force-rebuild:
 	find services -type f -name .target -delete
 	$(MAKE) build
 
-$(all_services): services/util/.target
+$(call as_targets,openedx/insights openedx/api hadoop/base hadoop/pipeline): services/util/.target
 
 $(call as_targets,$(hadoop_base_children)): services/hadoop/base/.target
 

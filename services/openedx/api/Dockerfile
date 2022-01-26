@@ -45,7 +45,8 @@ ENV ANALYTICS_API_CFG=${HOME}/analytics_api.yml
 ENV CFG_FILE=${ANALYTICS_API_CFG}
 
 COPY ./templates/analytics_api.yml ${CFG_FILE}.template
-COPY --from=util --chown=openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
+COPY --from=util --chown=openedx:openedx --chmod=700 /usr/local/bin/dockerize /usr/local/bin/
+COPY --from=util --chown=openedx:openedx --chmod=700 /util/marker/* /usr/local/bin/
 
 ENV APPLICATION_PORT=8100
 EXPOSE ${APPLICATION_PORT}

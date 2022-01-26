@@ -16,6 +16,13 @@ port=3306
 HERE
 )
 
+configure_credentials() {
+    cnf="${HOME}"/.my.cnf
+    touch "${cnf}"
+    chmod 600 "${cnf}"
+    echo "${cnf_string}" >> "${cnf}"
+}
+
 reinit_db() {
     emit "Forcing initialization of the analytics MySQL database."
     dockerize -wait tcp://mysql:3306 -timeout 5s || { echo "Unable to connect to the database. Is it running?"; exit 1; }
@@ -23,10 +30,7 @@ reinit_db() {
 }
 
 if [[ -n "${IS_MYSQL_REINIT_JOB}" ]]; then
-    cnf="${HOME}"/.my.cnf
-    touch "${cnf}"
-    chmod 600 "${cnf}"
-    echo "${cnf_string}" >> "${cnf}"
+    configure_credentials
     reinit_db
     emit "Finished database (re)initialization. Exiting."
     exit 0

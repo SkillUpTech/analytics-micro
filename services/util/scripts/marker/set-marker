@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Usage:
+#   set-marker MARKER
+# 
+# Mark MARKER as done (true/1).
+
+
+# Wait for the mysql service:
+dockerize -wait tcp://mysql:3306
+
+cat <<HERE > /tmp/mysql_util.cnf
+[client]
+user=analytics-micro-util
+password=${UTILITY_USER_PASSWORD}
+host=mysql
+port=3306
+HERE
+
+query() {
+    mysql --defaults-extra-file=/tmp/mysql_util.cnf analytics-micro-marker -sNe "$@"
+}
+
+echo "Setting marker $1." >&2
+
+query "INSERT INTO marker (id,done) VALUES ('$1',1) ON DUPLICATE KEY UPDATE done=1"
+
+echo "Done." >&2
