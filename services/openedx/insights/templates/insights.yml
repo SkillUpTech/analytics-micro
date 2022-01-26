@@ -46,7 +46,7 @@ LMS_COURSE_SHORTCUT_BASE_URL: 'https://{{ .Env.LMS_BASE_URL }}/courses'
 MODULE_PREVIEW_URL: 'https://{{ .Env.LMS_BASE_URL }}/xblock'
 OPEN_SOURCE_URL: '{{ .Env.OPEN_SOURCE_URL }}'
 PLATFORM_NAME: edX
-PRIVACY_POLICY_URL: http://example.com/privacy-policy
+PRIVACY_POLICY_URL: 'http://{{ .Env.OPEN_SOURCE_URL }}/privacy-policy'
 RESEARCH_URL: https://www.edx.org/research-pedagogy
 SECRET_KEY: '{{ .Env.SECRET_KEY }}'
 SEGMENT_IGNORE_EMAIL_REGEX: null
