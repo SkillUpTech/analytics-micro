@@ -21,16 +21,19 @@ FROM ${REGISTRY}/openedx/base:latest AS insights
 
 ENV EDX_PROJECT_NAME=edx_analytics_dashboard
 RUN mkdir ${EDX_PROJECT_NAME}
-COPY --chown=hadoop:hadoop ./requirements/* ${EDX_PROJECT_NAME}/
+COPY --chown=openedx:openedx ./requirements/* ${EDX_PROJECT_NAME}/
 
 ENV EDX_PROJECT_DIR=${HOME}/${EDX_PROJECT_NAME}
 ENV EDX_VENV=${HOME}/venv
+
 RUN cd ${EDX_PROJECT_NAME} && virtualenv ${EDX_VENV} && . ${EDX_VENV}/bin/activate && poetry install
+RUN apt-get -y update \
+    && apt-get -y install nodejs npm \
+    && cd "${EDX_PROJECT_NAME}" \
+    && make static
 
-COPY --from=repo --chown=hadoop:hadoop /opt/repo/ ${EDX_PROJECT_NAME}/
-
+COPY --from=repo --chown=openedx:openedx /opt/repo/ ${EDX_PROJECT_NAME}/
 ENV PATH=${HOME}/nodeenvs/insights/bin:${EDX_VENV}/bin:${PATH}
-# TODO Node + static assets
 
 ENV EDX_APPLICATION=analytics_dashboard
 ENV THEME_SCSS=${EDX_PROJECT_DIR}/sass/themes/open-edx.scss
@@ -44,5 +47,4 @@ COPY --from=util --chown=openedx:openedx --chmod=700 /util/marker/* /usr/local/b
 
 ENV DJANGO_SETTINGS_MODULE=analytics_dashboard.settings.analytics_micro
 ENV APPLICATION_PORT=8110
-EXPOSE ${APPLICATION_PORT}
-# ENTRYPOINT [ "/usr/local/bin/launch-edx-server" ]
+EXPOSE 8110

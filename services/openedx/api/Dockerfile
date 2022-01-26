@@ -48,4 +48,4 @@ COPY --from=util --chown=openedx:openedx --chmod=700 /util/marker/* /usr/local/b
 
 ENV DJANGO_SETTINGS_MODULE=analyticsdataserver.settings.analytics_micro
 ENV APPLICATION_PORT=8100
-EXPOSE ${APPLICATION_PORT}
+EXPOSE 8100

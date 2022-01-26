@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-dockerize -wait tcp://insights:8110 -wait tcp://analytics-api:8100
+set -ex
+
+echo "Waiting for openedx services to come up." >&2
+dockerize -wait http://insights:8110 -wait http://analytics-api:8100 -timeout 20s > /dev/null 2>&1 || {
+    echo "Couldn't connect to http://insights:8110 and/or http://analytics-api:8100" >&2
+    exit 1
+}
 
 echo "Replacing current process with the Nginx Docker entrypoint." >&2
 exec /docker-entrypoint.sh "$@"

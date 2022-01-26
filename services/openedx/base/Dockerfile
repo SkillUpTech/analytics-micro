@@ -2,13 +2,25 @@ ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
 ARG UID=1000
 ARG GID=1000
 
+###### util
+# This lets us reference the utility image as 'util' in later stages.
+FROM ${REGISTRY}/util:latest AS util
+
 ###### openedx-base
 FROM python:2.7 AS openedx-base
 
+COPY --from=util --chown=openedx:openedx --chmod=700 /util/cleanshell /usr/local/bin/
+SHELL [ "cleanshell" ]
+
 # Applies a patch to the mysql.h header in the mariadb sources for backwards compatibility.
 RUN apt-get -y update \
-    && apt-get -y install default-mysql-client \
+    && apt-get -y install \
+        default-mysql-client \
+        nodejs \
+        npm \
     && sed '/st_mysql_options options;/a unsigned int reconnect;' /usr/include/mysql/mysql.h -i.bkp
+
+SHELL [ "sh", "-c" ]
 
 # Configure the openedx user.
 ARG UID GID

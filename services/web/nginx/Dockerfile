@@ -8,7 +8,7 @@ FROM ${REGISTRY}/util:latest AS util
 FROM nginx
 
 COPY ./templates/* /etc/nginx/templates/
-COPY ./scripts/wait-then-start /usr/local/bin/
+COPY --chmod=700 ./scripts/wait-then-start /usr/local/bin/
 COPY --from=util /usr/local/bin/dockerize /usr/local/bin
 ENTRYPOINT [ "wait-then-start" ]
 VOLUME [ "/etc/ssl/certs", "/etc/ssl/private" ]
