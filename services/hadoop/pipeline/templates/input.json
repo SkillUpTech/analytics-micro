@@ -1,0 +1,6 @@
+{
+    "username": "{{ .Env.LMS_DB_USER }}",
+    "host": "{{ .Env.LMS_DB_HOST }}",
+    "password": "{{ .Env.LMS_DB_PASSWORD }}",
+    "port": 3306
+}

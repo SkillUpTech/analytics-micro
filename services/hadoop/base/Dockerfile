@@ -15,7 +15,7 @@ RUN apk add --no-cache gnupg wget tar
 
 ARG HADOOP_MIRROR HADOOP_VERSION
 RUN cd /opt \
-    && wget --no-verbose https://dlcdn.apache.org/hadoop/common/KEYS \
+    && wget --no-verbose ${HADOOP_MIRROR}/KEYS \
     && gpg --import KEYS \
     && tgz=${HADOOP_VERSION}.tar.gz \
     && url=${HADOOP_MIRROR}/${HADOOP_VERSION}/${tgz} \
@@ -25,7 +25,7 @@ RUN cd /opt \
     && rm ${tgz} ${tgz}.asc KEYS
 
 ###### hadoop
-FROM ubuntu:bionic AS hadoop
+FROM debian:buster-slim AS hadoop
 
 COPY --from=util /util/cleanshell /usr/local/bin/
 SHELL [ "/usr/local/bin/cleanshell" ]
@@ -49,7 +49,7 @@ ENV PATH="$PATH:$JAVA_HOME/bin"
 
 ARG HADOOP_VERSION
 ENV HOME=/home/hadoop
-ENV HADOOP_HOME=/home/hadoop/${HADOOP_VERSION}
+ENV HADOOP_HOME=${HOME}/${HADOOP_VERSION}
 ENV PATH=${PATH}:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin
 
 COPY --from=hadoop-common --chown=hadoop:hadoop /opt/${HADOOP_VERSION} ${HADOOP_HOME}

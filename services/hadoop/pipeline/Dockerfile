@@ -3,6 +3,10 @@ ARG REPO_HOST=https://github.com/SkillUpTech
 ARG REPO_NAME=edx-analytics-pipeline
 ARG REPO_TAG=skt-ironwood
 
+###### util
+# Lets us reference the utililty image as 'util'
+FROM ${REGISTRY}/util:latest AS util
+
 ###### hadoop-base
 # Lets us reference the hadoop base image as 'hadoop-base'
 FROM ${REGISTRY}/hadoop/base:latest AS hadoop-base
@@ -39,3 +43,15 @@ RUN cd ${PIPELINE_REPO} \
     && . ${PIPELINE_VENV}/bin/activate \
     && poetry install \
     && make bootstrap
+
+# Replace the luigi snakebite client in the virtualenv.
+# TODO we should probably make a proper fork for this.
+COPY --chown=hadoop:hadoop ./misc/patched_snakebite_client.py \
+    ${PIPELINE_VENV}/src/luigi/luigi/contrib/hdfs/snakebite_client.py
+# Remove the compiled file so it can be regenerated from the new source.
+RUN rm -f ${PIPELINE_VENV}/src/luigi/luigi/contrib/hdfs/snakebite_client.pyc
+
+# Add Java
+ENV JAVA_HOME=/usr/local/openjdk-8
+COPY --from=openjdk:8 ${JAVA_HOME} ${JAVA_HOME}
+ENV PATH="$PATH:$JAVA_HOME/bin"

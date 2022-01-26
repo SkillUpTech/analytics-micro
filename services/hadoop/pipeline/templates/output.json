@@ -1,0 +1,6 @@
+{
+    "username": "pipeline001",
+    "host": "{{ .Env.MYSQL_PIPELINE_HOST }}",
+    "password": "{{ .Env.MYSQL_PIPELINE001_PASSWORD }}",
+    "port": 3306
+}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -ex
+
+dockerize -template "${HIVE_SITE_XML}".template:"${HIVE_SITE_XML}"
+hive-server-2
