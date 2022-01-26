@@ -5,10 +5,10 @@ openedx_services := openedx/api openedx/insights
 web_services := web/mysql web/nginx
 
 # Services which depend on hadoop/base
-hadoop_base_children := hadoop/hdfs hadoop/pipeline
+hadoop_base_children := hadoop/hdfs hadoop/pipeline hadoop/hive-server
 
 # Services which depend on openedx/base
-openedx_base_children := openedx/api openedx/insights openedx/database-worker
+openedx_base_children := openedx/api openedx/insights
 
 # Macros
 tag = $(patsubst services/%/.target,$(docker_registry)/%:$(am_version),$@)
@@ -21,15 +21,16 @@ all_services := $(call as_targets,$(hadoop_services) $(openedx_services) $(web_s
 SHELL := /bin/bash
 
 # Targets
-.PHONY: default up logs
+.PHONY: help up logs force-rebuild
 
 help:
 	@echo "-- Available commands --"
-	@echo "make build     Build all images locally as needed."
-	@echo "make init      Generate default .env files in $$(realpath ./conf/) as needed."
-	@echo "make up        Start and detach from all services, then follow the log stream."
-	@echo "make logs      Follow the log streams of all running services."
-	@echo "make dev       Equivalent to running 'build' then 'init'"
+	@echo "make build           Build all images locally as needed."
+	@echo "make init            Generate default .env files in $$(realpath ./conf/) as needed."
+	@echo "make up              Start and detach from all services, then follow the log stream."
+	@echo "make logs            Follow the log streams of all running services."
+	@echo "make dev             Equivalent to running 'build' then 'init'"
+	@echo "make force-rebuild   Destroy all target files, then run 'make build'"
 
 init:
 	find conf/ -type f -name '*.template' -exec sh -xc 'cp --no-clobber -- $$1 $${1%.template}' 'make-init' '{}' \;
@@ -44,6 +45,10 @@ logs:
 dev: build init
 
 build: $(all_services)
+
+force-rebuild:
+	find services -type f -name .target -delete
+	$(MAKE) build
 
 $(all_services): services/util/.target
 
