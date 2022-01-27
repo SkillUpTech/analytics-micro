@@ -3,4 +3,6 @@
 set -ex
 
 dockerize -template "${HIVE_SITE_XML}".template:"${HIVE_SITE_XML}"
+echo "Launching hiveserver2" >&2
+
 hiveserver2

@@ -25,7 +25,7 @@ RUN cd /opt \
     && rm ${tgz} ${tgz}.asc KEYS
 
 ###### hadoop
-FROM debian:buster-slim AS hadoop
+FROM debian:buster AS hadoop
 
 COPY --from=util /util/cleanshell /usr/local/bin/
 SHELL [ "/usr/local/bin/cleanshell" ]

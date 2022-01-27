@@ -4,10 +4,17 @@ set -ex
 
 node_type="$1"
 
-formatted_marker="$HDFS_DATA_ROOT"/."${node_type}"-formatted
-
-if [[ ! -f "$formatted_marker" ]]; then
-    yes | hadoop "${node_type}" -format && touch "$formatted_marker"
-fi
-
-hdfs "${node_type}" "${@:2}"
+case "$1" in
+    namenode|datanode)
+        echo "Starting $1."
+        hdfs "${node_type}" "${@:2}"
+    ;;
+    format)
+        echo "Formatting namenode." >&2
+        yes | hadoop namenode -format
+        echo "Done" >&2
+    ;;
+    *)
+        echo "Invalid command: $1" >&2
+    ;;
+esac

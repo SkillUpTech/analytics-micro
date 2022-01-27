@@ -3,6 +3,7 @@ am_version ?= latest
 hadoop_services := hadoop/hdfs hadoop/pipeline hadoop/spark hadoop/hive-server
 openedx_services := openedx/api openedx/insights
 web_services := web/mysql web/nginx
+compose := docker-compose -f docker-compose.yml -f docker-compose.pipeline.yml
 
 # Services which depend on hadoop/base
 hadoop_base_children := hadoop/hdfs hadoop/pipeline hadoop/hive-server
@@ -37,27 +38,36 @@ all_services := $(call as_targets,$(hadoop_services) $(openedx_services) $(web_s
 SHELL := /bin/bash
 
 # Targets
-.PHONY: help build init up logs dev force-rebuild
+.PHONY: help build init up down logs dev force-rebuild destroy
 
 help:
 	@echo "-- Available commands --"
-	@echo "make build           Build all images locally as needed."
-	@echo "make init            Generate target files and default .env files in $$(realpath ./conf/) as needed."
-	@echo "make up              Start and detach from all services, then follow the log stream."
-	@echo "make logs            Follow the log streams of all running services."
-	@echo "make dev             Equivalent to running 'init' then 'build'"
-	@echo "make force-rebuild   Destroy and recreate all target files, then run 'make build'"
+	@echo "make build             Build all images locally as needed."
+	@echo "make init              Generate target files and default .env files in $$(realpath ./conf/) as needed."
+	@echo "make up                Start and detach from all services, then follow the log stream."
+	@echo "make down              Stop all services and remove containers."
+	@echo "make logs              Follow the log streams of all running services."
+	@echo "make dev               Equivalent to running 'init' then 'build'"
+	@echo "make force-rebuild     Destroy and recreate all target files, then run 'make build'"
+	@echo "make format-namenode   WARNING: Format the HDFS NameNode (loses all data)."
+	@echo "make destroy           WARNING: Destroys all containers AND VOLUMES!"
+	@echo "make shell.SERVICE     Launch and attach a one-off shell container for the given SERVICE name."
+	@echo "make exec.SERVICE      Attach a bash shell directly to a live SERVICE by name."
+	@echo "make start.SERVICE     Launch a one-off instance of SERVICE after bringing up its dependencies."
 
 init:
 	$(init_templates)
 	$(create_targets)
 
 up:
-	docker-compose up --detach
-	docker-compose logs --tail 0 --follow
+	$(compose) up --detach
+	$(compose) logs --tail 0 --follow
+
+down:
+	$(compose) down
 
 logs:
-	docker-compose logs --tail 0 --follow
+	$(compose) logs --tail 0 --follow
 
 dev: init build
 
@@ -67,6 +77,21 @@ force-rebuild:
 	$(destroy_targets)
 	$(create_targets)
 	$(MAKE) build
+
+format-namenode:
+	$(compose) run namenode format
+
+destroy:
+	$(compose) down -v
+	
+shell.%:
+	$(compose) run --rm --entrypoint /usr/bin/env $(patsubst shell.%,%,$@) bash
+
+exec.%:
+	docker exec -it analytics-micro_$(patsubst exec.%,%,$@)_1 bash
+
+start.%:
+	$(compose) run --rm $(patsubst start.%,%,$@)
 
 $(call as_targets,web/nginx): $(call as_targets,openedx/insights openedx/api)
 

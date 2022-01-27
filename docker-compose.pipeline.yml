@@ -5,19 +5,40 @@ services:
     volumes:
       - hdfs_data:/home/hadoop/var
       - ${LOCALDATA}/hadoop:/home/hadoop/config
-    command: hdfs-entrypoint.sh namenode
+    command: namenode
     networks:
       - analytics-micro-net
+    depends_on:
+      - datanode
+    expose:
+      - "9000"
+      - "8020"
   
   datanode:
     image: ${REGISTRY}/hadoop/hdfs
     restart: unless-stopped
     volumes:
       - hdfs_data:/home/hadoop/var
-      - ${LOCALDATA}/hadoop:/home/hadoop/config
-    command: hdfs-entrypoint.sh datanode
+    command: datanode
     networks:
       - analytics-micro-net
+    expose:
+      - "9866"
+      - "9000"
+
+  hive-server:
+    image: ${REGISTRY}/hadoop/hive-server
+    restart: unless-stopped
+    volumes:
+      - hdfs_data:/home/hadoop/var
+    command: datanode
+    env_file:
+      - conf/analytics.env
+    networks:
+      - analytics-micro-net
+    expose:
+      - "9866"
+      - "9000"
 
   spark:
     image: docker.io/bitnami/spark:3
@@ -29,6 +50,8 @@ services:
       - SPARK_SSL_ENABLED=no
     networks:
       - analytics-micro-net
+    depends_on:
+      - spark-worker
 
   spark-worker:
     image: docker.io/bitnami/spark:3
@@ -43,10 +66,19 @@ services:
       - SPARK_SSL_ENABLED=no
     networks:
       - analytics-micro-net
-
-networks:
-  analytics-micro-net:
-    external: true
+    
+  pipeline:
+    image: ${REGISTRY}/hadoop/pipeline:latest
+    volumes:
+      - ${LOCALDATA}/tracking-logs:/var/tracking-logs:ro
+    env_file:
+      - conf/analytics.env
+    depends_on:
+      - namenode
+      - spark
+      - hive-server
+    networks:
+      - analytics-micro-net
 
 volumes:
   hdfs_data:

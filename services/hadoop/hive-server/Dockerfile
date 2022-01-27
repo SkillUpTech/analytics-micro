@@ -21,13 +21,18 @@ RUN cd /opt \
 ###### hive-server
 FROM ${REGISTRY}/hadoop/base:latest AS hive-server
 
+USER root
+RUN apt-get -y update && apt-get install -y procps
+USER hadoop
+
 # Add hive
 ARG HIVE_VERSION
 ENV HIVE_HOME=${HOME}/${HIVE_VERSION}
-ENV PATH=$PATH:${HIVE_HOME}/bin
 COPY --from=hive-bin --chown=hadoop:hadoop /opt/apache-${HIVE_VERSION}-bin ${HIVE_HOME}
 
 ENV HIVE_SITE_XML=${HIVE_HOME}/conf/hive-site.xml
+ENV CORE_SITE_XML=${HADOOP_HOME}/conf/core-site.xml
+ENV PATH=$PATH:${HIVE_HOME}/bin
 COPY --chown=hadoop:hadoop ./config/hive-site.xml ${HIVE_SITE_XML}.template
 
 COPY --chown=hadoop:hadoop --chmod=700 ./scripts/start-hive-server /usr/local/bin/

@@ -1,7 +1,32 @@
 #!/bin/bash
 
-set -ex
+set -x
 
 source ${PIPELINE_VENV}/bin/activate
 
+: ${EARLIEST_LOG_DATE:=2020-01-01}
+: ${N_REDUCE_TASKS:=4}
+: ${TRACKING_LOG_DIR:='/var/tracking-logs'}
 
+dockerize -template "$HOME"/templates/override.cfg:"${PIPELINE_REPO}"/override.cfg
+
+while ! hdfs dfs -test -e hdfs://namenode:9000/*; do
+    echo "HDFS namenode not yet reachable. Sleeping for 2 seconds."
+    sleep 2
+done
+
+hdfs dfs -mkdir -p /data \
+    /edx-analytics-pipeline/warehouse \
+    /edx-analytics-pipeline/marker \
+    /edx-analytics-pipeline/event-export/output/ \
+    /edx-analytics-pipeline/event-export-by-course/output/ \
+    /edx-analytics-pipeline/obfuscation/output/ \
+    /edx-analytics-pipeline/manifest/ \
+    /edx-analytics-pipeline/activity/
+hdfs dfs -put "${TRACKING_LOG_DIR}"/* /data
+
+cd "${PIPELINE_REPO}"
+launch-task CourseEnrollmentEventsTask \
+    --local-scheduler \
+    --interval ${EARLIEST_LOG_DATE}-"$(date -d "today" +%Y-%m-%d)" \
+    --n-reduce-tasks ${N_REDUCE_TASKS}
