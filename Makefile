@@ -10,30 +10,47 @@ hadoop_base_children := hadoop/hdfs hadoop/pipeline hadoop/hive-server
 # Services which depend on openedx/base
 openedx_base_children := openedx/api openedx/insights
 
-# Macros
+# - Macros - #
+
+# Generate the appropriate Docker image tag corresponding to the current target.
 tag = $(patsubst services/%/.target,$(docker_registry)/%:$(am_version),$@)
+
+# Execute the appropriate 'docker build' command for the current target.
 docker_build = cd $(dir $@) && DOCKER_BUILDKIT=1 docker build --tag $(tag) .
+
+# Copy each '.env.template' file under conf/ to create the corresponding '.env' configuration files. Has no effect if the '.env' file already exists.
+init_templates = find conf/ -type f -name '*.template' -exec sh -xc 'cp --no-clobber -- $$1 $${1%.template}' 'make-init' '{}' \;
+
+# Places a file named '.target' in each directory which contains a Dockerfile. The timestamp of the .target file is set to 1 second prior to that of the Dockerfile.
+create_targets = find services/ -type f -name Dockerfile -exec sh -xc 'touch -d "$$(date -R -r $$1) - 1 second" $$(dirname "$$1")/.target' 'create-targets'  '{}' \;
+
+# Deletes all files named '.target' in the 'services' directory.
+destroy_targets = find services/ -type f -name .target -delete
+
+# Function which accepts an abbreviated target name (ex: 'openedx/insights') and produces the corresponding target path (ex: 'services/openedx/insights/.target').
 as_targets = $(patsubst %,services/%/.target,$1)
 
-# Convenience variables
+# - Convenience variables - #
+
 all_services := $(call as_targets,$(hadoop_services) $(openedx_services) $(web_services))
 
 SHELL := /bin/bash
 
 # Targets
-.PHONY: help up logs force-rebuild
+.PHONY: help build init up logs dev force-rebuild
 
 help:
 	@echo "-- Available commands --"
 	@echo "make build           Build all images locally as needed."
-	@echo "make init            Generate default .env files in $$(realpath ./conf/) as needed."
+	@echo "make init            Generate target files and default .env files in $$(realpath ./conf/) as needed."
 	@echo "make up              Start and detach from all services, then follow the log stream."
 	@echo "make logs            Follow the log streams of all running services."
-	@echo "make dev             Equivalent to running 'build' then 'init'"
-	@echo "make force-rebuild   Destroy all target files, then run 'make build'"
+	@echo "make dev             Equivalent to running 'init' then 'build'"
+	@echo "make force-rebuild   Destroy and recreate all target files, then run 'make build'"
 
 init:
-	find conf/ -type f -name '*.template' -exec sh -xc 'cp --no-clobber -- $$1 $${1%.template}' 'make-init' '{}' \;
+	$(init_templates)
+	$(create_targets)
 
 up:
 	docker-compose up --detach
@@ -42,13 +59,16 @@ up:
 logs:
 	docker-compose logs --tail 0 --follow
 
-dev: build init
+dev: init build
 
 build: $(all_services)
 
 force-rebuild:
-	find services -type f -name .target -delete
+	$(destroy_targets)
+	$(create_targets)
 	$(MAKE) build
+
+$(call as_targets,web/nginx): $(call as_targets,openedx/insights openedx/api)
 
 $(call as_targets,openedx/insights openedx/api hadoop/base hadoop/pipeline): services/util/.target
 

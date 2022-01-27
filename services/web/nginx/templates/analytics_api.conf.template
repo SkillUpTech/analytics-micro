@@ -23,7 +23,7 @@ server {
   listen 18100;
   
   location ~ ^/static/(?P<file>.*) {
-    root /edx/var/analytics_api;
+    root /var/static/api/;
       if ($request_method = 'OPTIONS') {
         add_header 'Access-Control-Allow-Origin' $cors_origin;
         add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
@@ -45,7 +45,7 @@ server {
   }
 
   location ~ ^/media/(?P<file>.*) {
-    root /edx/var/analytics_api;
+    root /var/static/api/;
     try_files /media/$file =404;
   }
 

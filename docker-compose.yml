@@ -30,6 +30,9 @@ services:
       - "443:443"
     networks:
       - analytics-micro-net
+    depends_on:
+      - analytics-api
+      - insights
 
   mysql:
     image: ${REGISTRY}/web/mysql
@@ -68,8 +71,6 @@ services:
 volumes:
   elasticsearch_data:
   mysql_data:
-  insights_static:
-  api_static:
 
 networks:
   analytics-micro-net:
