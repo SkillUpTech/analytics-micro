@@ -46,8 +46,6 @@ services:
   analytics-api:
     image: ${REGISTRY}/openedx/api
     restart: unless-stopped
-    volumes:
-      - openedx_marker:/home/openedx/marker
     env_file:
       - conf/analytics.env
     networks:
@@ -61,8 +59,6 @@ services:
     restart: unless-stopped
     env_file:
       - conf/analytics.env
-    volumes:
-      - openedx_marker:/home/openedx/marker
     networks:
       - analytics-micro-net
     depends_on:
@@ -72,7 +68,6 @@ services:
 volumes:
   elasticsearch_data:
   mysql_data:
-  openedx_marker:
   insights_static:
   api_static:
 
