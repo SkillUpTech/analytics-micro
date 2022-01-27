@@ -24,8 +24,8 @@ FROM ${REGISTRY}/openedx/base AS api
 
 ENV EDX_PROJECT_NAME=edx_analytics_data_api
 RUN mkdir ${EDX_PROJECT_NAME}
-COPY --from=repo --chown=hadoop:hadoop /opt/repo/pyproject.toml ${EDX_PROJECT_NAME}/
-COPY --from=repo --chown=hadoop:hadoop /opt/repo/poetry.lock ${EDX_PROJECT_NAME}/
+COPY --chown=hadoop:hadoop ./requirements/pyproject.toml ${EDX_PROJECT_NAME}/
+COPY --chown=hadoop:hadoop ./requirements/poetry.lock ${EDX_PROJECT_NAME}/
 
 ENV EDX_PROJECT_DIR=${HOME}/${EDX_PROJECT_NAME}
 ENV EDX_VENV=${HOME}/venv

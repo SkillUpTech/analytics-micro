@@ -19,21 +19,45 @@ RUN apk add --no-cache git \
 ###### insights
 FROM ${REGISTRY}/openedx/base:latest AS insights
 
+# Install nvm.
+ENV NVM_DIR=$HOME/.nvm
+ENV NODE_VERSION=14.17.4
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+    && echo '. "${NVM_DIR}"/nvm.sh' >> "${HOME}"/.bashrc.d/nvm \
+    && . "${HOME}"/.bashrc.d/nvm \
+    && nvm install ${NODE_VERSION} \
+    && nvm alias default ${NODE_VERSION} \
+    && nvm use default
+ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH=$NVM_DIR/v$NODE_VERSION/bin:$PATH
+
 ENV EDX_PROJECT_NAME=edx_analytics_dashboard
 RUN mkdir ${EDX_PROJECT_NAME}
-COPY --chown=openedx:openedx ./requirements/* ${EDX_PROJECT_NAME}/
+COPY --chown=openedx:openedx ./requirements/pyproject.toml ${EDX_PROJECT_NAME}/
+COPY --chown=openedx:openedx ./requirements/poetry.lock ${EDX_PROJECT_NAME}/
 
 ENV EDX_PROJECT_DIR=${HOME}/${EDX_PROJECT_NAME}
 ENV EDX_VENV=${HOME}/venv
 
-RUN cd ${EDX_PROJECT_NAME} && virtualenv ${EDX_VENV} && . ${EDX_VENV}/bin/activate && poetry install
-RUN apt-get -y update \
-    && apt-get -y install nodejs npm \
-    && cd "${EDX_PROJECT_NAME}" \
-    && make static
+RUN cd ${EDX_PROJECT_NAME} \
+    && virtualenv ${EDX_VENV} \
+    && . ${EDX_VENV}/bin/activate \
+    && poetry install
+
+COPY --chown=openedx:openedx ./requirements/package.json ${EDX_PROJECT_NAME}/
+COPY --chown=openedx:openedx ./requirements/package-lock.json ${EDX_PROJECT_NAME}/
+COPY --chown=openedx:openedx ./requirements/Makefile ${EDX_PROJECT_NAME}/
+COPY --chown=openedx:openedx --chmod=700 ./requirements/npm-post-install.sh ${EDX_PROJECT_NAME}/
+
+
+RUN source "${HOME}"/.bashrc.d/nvm \
+    && cd ${EDX_PROJECT_NAME} \
+    && make requirements.js
 
 COPY --from=repo --chown=openedx:openedx /opt/repo/ ${EDX_PROJECT_NAME}/
 ENV PATH=${HOME}/nodeenvs/insights/bin:${EDX_VENV}/bin:${PATH}
+
+RUN source "${HOME}"/.bashrc.d/nvm && cd ${EDX_PROJECT_NAME} && make static
 
 ENV EDX_APPLICATION=analytics_dashboard
 ENV THEME_SCSS=${EDX_PROJECT_DIR}/sass/themes/open-edx.scss
