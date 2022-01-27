@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Acts as a shell which cleans temporary files after each invocation.
 
 set -e
@@ -10,5 +10,5 @@ set -e
 eval "$@"
 
 for tmpdir in ${CLEANSHELL_DIRS}; do
-    [[ ! -d "${tmpdir}" ]] || find "${tmpdir}" -type f -delete
+    [[ ! -d "${tmpdir}" ]] || find "${tmpdir}" -not -user "$(whoami)" -prune -or -user "$(whoami)" -type f -exec rm {} +
 done
