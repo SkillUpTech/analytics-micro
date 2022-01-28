@@ -39,6 +39,7 @@ RUN addgroup --gid ${GID} hadoop \
         --uid ${UID} \
         --gid ${GID} hadoop \
     && chown hadoop:hadoop /usr/local/bin/*
+RUN apt-get -y update && apt-get -y install libmariadb-java
 
 USER hadoop
 WORKDIR /home/hadoop

@@ -1,6 +1,7 @@
 ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
 ARG HIVE_MIRROR=https://dlcdn.apache.org/hive 
 ARG HIVE_VERSION=hive-2.3.9
+ARG MYSQL_CONNECTOR_URL=https://dev.mysql.com/downloads/file/?id=509727
 
 ###### hive-bin
 FROM alpine:latest AS hive-bin
@@ -22,13 +23,15 @@ RUN cd /opt \
 FROM ${REGISTRY}/hadoop/base:latest AS hive-server
 
 USER root
-RUN apt-get -y update && apt-get install -y procps
+RUN apt-get -y update \
+    && apt-get -y install procps libmariadb-java
 USER hadoop
 
 # Add hive
 ARG HIVE_VERSION
 ENV HIVE_HOME=${HOME}/${HIVE_VERSION}
 COPY --from=hive-bin --chown=hadoop:hadoop /opt/apache-${HIVE_VERSION}-bin ${HIVE_HOME}
+RUN cd ${HIVE_HOME}/lib && ln -s /usr/share/java/mariadb-java-client.jar mariadb-java-client.jar
 
 ENV HIVE_SITE_XML=${HIVE_HOME}/conf/hive-site.xml
 ENV CORE_SITE_XML=${HADOOP_HOME}/conf/core-site.xml

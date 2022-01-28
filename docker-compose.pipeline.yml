@@ -36,6 +36,9 @@ services:
       - conf/analytics.env
     networks:
       - analytics-micro-net
+    depends_on:
+      - namenode
+      - mysql
     expose:
       - "9866"
       - "9000"
@@ -77,6 +80,7 @@ services:
       - namenode
       - spark
       - hive-server
+      - nginx
     networks:
       - analytics-micro-net
 

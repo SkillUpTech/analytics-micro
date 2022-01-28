@@ -15,11 +15,11 @@
   </property>
   <property>
     <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:mysql://mysql:3306/edx_hive_metastore</value>
+    <value>jdbc:mariadb://mysql:3306/edx_hive_metastore</value>
   </property>
   <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mysql.jdbc.Driver</value>
+    <value>com.mariadb.jdbc.Driver</value>
   </property>
   <property>
     <name>hive.metastore.warehouse.dir</name>

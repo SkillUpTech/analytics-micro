@@ -38,13 +38,14 @@ all_services := $(call as_targets,$(hadoop_services) $(openedx_services) $(web_s
 SHELL := /bin/bash
 
 # Targets
-.PHONY: help build init up down logs dev force-rebuild destroy
+.PHONY: help build init up hadoop-tasks down logs dev force-rebuild destroy
 
 help:
 	@echo "-- Available commands --"
 	@echo "make build             Build all images locally as needed."
 	@echo "make init              Generate target files and default .env files in $$(realpath ./conf/) as needed."
-	@echo "make up                Start and detach from all services, then follow the log stream."
+	@echo "make up                Start and detach from the non-hadoop services, then follow the log stream."
+	@echo "make hadoop-tasks      Start the hadoop services, then update the insights data."
 	@echo "make down              Stop all services and remove containers."
 	@echo "make logs              Follow the log streams of all running services."
 	@echo "make dev               Equivalent to running 'init' then 'build'"
@@ -60,7 +61,11 @@ init:
 	$(create_targets)
 
 up:
-	$(compose) up --detach
+	$(compose) up --detach nginx
+	$(compose) logs --tail 0 --follow
+
+hadoop-tasks:
+	$(compose) up --detach pipeline
 	$(compose) logs --tail 0 --follow
 
 down:
