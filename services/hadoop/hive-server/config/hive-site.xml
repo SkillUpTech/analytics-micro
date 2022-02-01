@@ -19,7 +19,7 @@
   </property>
   <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mariadb.jdbc.Driver</value>
+    <value>org.mariadb.jdbc.Driver</value>
   </property>
   <property>
     <name>hive.metastore.warehouse.dir</name>
