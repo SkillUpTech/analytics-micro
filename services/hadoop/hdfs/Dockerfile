@@ -1,4 +1,4 @@
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG REGISTRY=sktpub.azurecr.io/analytics-micro
 
 ###### util
 # Allows us to reference the utility image as 'util' in later stages.

@@ -1,6 +1,6 @@
 ARG HADOOP_MIRROR=https://dlcdn.apache.org/hadoop/common
 ARG HADOOP_VERSION=hadoop-3.3.1
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG REGISTRY=sktpub.azurecr.io/analytics-micro
 ARG UID=1001
 ARG GID=1001
 ARG HIVE_MIRROR=https://dlcdn.apache.org/hive 

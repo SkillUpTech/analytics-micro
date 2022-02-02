@@ -1,4 +1,4 @@
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG REGISTRY=sktpub.azurecr.io/analytics-micro
 ARG REPO_HOST=https://github.com/SkillUpTech
 ARG REPO_NAME=edx-analytics-pipeline
 ARG REPO_TAG=skt-ironwood

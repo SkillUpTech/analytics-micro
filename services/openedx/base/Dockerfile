@@ -1,4 +1,4 @@
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG REGISTRY=sktpub.azurecr.io/analytics-micro
 ARG UID=1000
 ARG GID=1000
 

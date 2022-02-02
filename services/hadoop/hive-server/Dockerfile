@@ -1,4 +1,4 @@
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG REGISTRY=sktpub.azurecr.io/analytics-micro
 
 ###### hive-server
 FROM ${REGISTRY}/hadoop/base:latest AS hive-server

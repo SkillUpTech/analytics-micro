@@ -8,7 +8,7 @@ Please note this is *NOT* an official EdX repository. Skill-Up Technologies (Fle
 
 This implementation of the OpenEdX Analyticstack is broken into eight images. The source files for each image can be found in the `services/` directory. The services are divided into three categories ("stacks"), which are reflected in the directory structure of the repository: the Hadoop stack (`hadoop`), the OpenEdX stack (`openedx`), and the web stack (`web`).
 
-By default, all images are tagged with the registry `skt-pub.azurecr.io/analytics-micro`.
+By default, all images are tagged with the registry `sktpub.azurecr.io/analytics-micro`.
 
 #### Hadoop
 

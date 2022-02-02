@@ -1,4 +1,4 @@
-docker_registry ?= skt-pub.azurecr.io/analytics-micro
+docker_registry ?= sktpub.azurecr.io/analytics-micro
 am_version ?= latest
 hadoop_services := hadoop/hdfs hadoop/pipeline hadoop/spark hadoop/hive-server
 openedx_services := openedx/api openedx/insights

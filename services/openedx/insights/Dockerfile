@@ -1,7 +1,7 @@
 ARG REPO_HOST=https://github.com/SkillUpTech
 ARG REPO_NAME=edx-analytics-dashboard
 ARG REPO_TAG=skt-ironwood/0.1.1
-ARG REGISTRY=skt-pub.azurecr.io/analytics-micro
+ARG REGISTRY=sktpub.azurecr.io/analytics-micro
 
 ###### util
 # This lets us reference the utility image as 'util' in later stages.
