@@ -13,12 +13,10 @@ RUN apk add --no-cache git \
 ###### pipeline
 FROM ${REGISTRY}/hadoop/base:latest AS pipeline
 
-RUN apt-get -y update && apt-get -y install python python-virtualenv python-pip && rm -rf /var/lib/apt/lists/*
-
-ENV HOME=/home/hadoop
 USER hadoop
-# Install poetry
-RUN pip install --user poetry
+# Install poetry.
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+ENV PATH=$PATH:$HOME/.poetry/bin 
 
 ARG REPO_NAME
 ENV PIPELINE_REPO=${HOME}/${REPO_NAME}
@@ -43,4 +41,3 @@ COPY --chown=hadoop:hadoop ./templates/override.cfg $HOME/templates/
 
 COPY --chown=hadoop:hadoop --chmod=700 ./scripts/update-insights /usr/local/bin/
 ENTRYPOINT [ "update-insights" ]
-

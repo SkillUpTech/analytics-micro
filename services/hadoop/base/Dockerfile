@@ -43,7 +43,7 @@ RUN cd /opt \
     && rm ${tgz} ${tgz}.asc KEYS
 
 ###### hadoop
-FROM debian:buster AS hadoop
+FROM python:2.7-buster AS hadoop
 
 COPY --from=util /util/cleanshell /usr/local/bin/
 SHELL [ "/usr/local/bin/cleanshell" ]
