@@ -19,6 +19,12 @@ tag = $(patsubst services/%/.target,$(docker_registry)/%:$(am_version),$@)
 # Execute the appropriate 'docker build' command for the current target.
 docker_build = cd $(dir $@) && DOCKER_BUILDKIT=1 docker build --tag $(tag) .
 
+# Generate the appropriate Docker image tag corresponding to the target to be pushed.
+push_tag = $(patsubst services/%/.push,$(docker_registry)/%,$@)
+
+# Execute 'docker push' on the current target. Pushes all tags.
+docker_push = docker push -a $(push_tag)
+
 # Copy each '.env.template' file under conf/ to create the corresponding '.env' configuration files. Has no effect if the '.env' file already exists.
 init_templates = find conf/ -type f -name '*.template' -exec sh -xc 'cp --no-clobber -- $$1 $${1%.template}' 'make-init' '{}' \;
 
@@ -30,6 +36,9 @@ destroy_targets = find services/ -type f -name .target -delete
 
 # Function which accepts an abbreviated target name (ex: 'openedx/insights') and produces the corresponding target path (ex: 'services/openedx/insights/.target').
 as_targets = $(patsubst %,services/%/.target,$1)
+
+# Function which accepts an abbreviated target name (ex: 'openedx/insights') and produces the corresponding 'push' target (ex: 'services/openedx/insights/.push').
+as_push = $(patsubst %,services/%/.push,$1)
 
 # - Convenience variables - #
 
@@ -97,6 +106,11 @@ exec.%:
 
 start.%:
 	$(compose) run --rm $(patsubst start.%,%,$@)
+
+push: $(call as_push,$(hadoop_services) $(openedx_services) $(web_services))
+
+%/.push:
+	$(docker_push)
 
 $(call as_targets,web/nginx): $(call as_targets,openedx/insights openedx/api)
 

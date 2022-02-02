@@ -142,3 +142,30 @@ make hadoop-tasks
 ```
 
 This command should be run while the core (OpenEdx and web) stack is also running concurrently.
+
+
+### Pushing Images to the Registry
+
+By default, all images are tagged with the `sktpub.azurecr.io/analytics-micro` container registry. To push to a registry, ensure you have access. The following directions assume you are using an Azure Container Registry (acr) and will use the aforementioned registry as an example.
+
+#### Authenticate with the `az` CLI
+
+```shell
+az login --use-device-code
+```
+
+Follow the prompt to authenticate with Azure.
+
+#### Authenticate with the Registry
+
+```shell
+az acr login --name sktpub
+```
+
+#### Push the Images
+
+To push all tags of all built images to the registry, execute:
+
+```shell
+make push
+```
