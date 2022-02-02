@@ -65,7 +65,7 @@ up:
 	$(compose) logs --tail 0 --follow
 
 hadoop-tasks:
-	$(compose) up --detach pipeline
+	$(compose) run --detach pipeline
 	$(compose) logs --tail 0 --follow
 
 down:
