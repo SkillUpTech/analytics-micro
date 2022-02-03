@@ -52,6 +52,7 @@ SHELL := /bin/bash
 help:
 	@echo "-- Available commands --"
 	@echo "make build             Build all images locally as needed."
+	@echo "make build.SERVICE     Build the image for only the given SERVICE. Use dots (.) instead of slashes (/) for SERVICE here."
 	@echo "make init              Generate target files and default .env files in $$(realpath ./conf/) as needed."
 	@echo "make up                Start and detach from the non-hadoop services, then follow the log stream."
 	@echo "make hadoop-tasks      Start the hadoop services, then update the insights data."
