@@ -87,6 +87,9 @@ dev: init build
 
 build: $(all_services)
 
+build.%:
+	$(MAKE) services/$(subst .,/,$*)/.target
+
 force-rebuild:
 	$(destroy_targets)
 	$(create_targets)
