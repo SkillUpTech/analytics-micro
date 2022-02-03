@@ -133,7 +133,7 @@ To do so, it first loads the tracking logs into an HDFS persistent storage volum
 
 In order to populate analytics data from the tracking logs, you'll need to configure the hadoop stack to be run daily. This can be done, for instance, using a cron-job. 
 
-Begin by populating all relevant tracking logs into the pipeline's data volume (by default: `data/hadoop/`). This can be accomplished using `rsync`, for instance.
+Begin by populating all relevant tracking logs into the pipeline's data volume (by default: `data/tracking-logs/`). This can be accomplished using `rsync`, for instance.
 
 To bring the Hadoop stack online, execute the pipeline tasks, then bring the stack back down again, use the following command:
 
@@ -169,3 +169,135 @@ To push all tags of all built images to the registry, execute:
 ```shell
 make push
 ```
+
+### Makefile
+
+#### About
+
+*This section delves into the technical details of the Makefile used by this repository. This knowledge is generally not important unless you wish to modify the Makefile itself. Feel free to skip to the next section for a description of the basic `make` commands.*
+
+Most development-related tasks are fully automated in the `Makefile` at the root of this repository.
+
+The primary reason for using Make is to ensure that images are always built in the correct order. As previously discussed, an empty file named `.target` is placed alongside each `Dockerfile` in the `images/` directory. Each time an image is built using `make build`, the timestamp of the corresponding `.target` file is updated. This allows Make to determine whether the `Dockerfile` (or any other file/directory) alongside each `.target` file has been modified since the last build. If it has, the corresponding image will be rebuilt upon the next invocation of `make build`. If not, the build for that image can be skipped.
+
+As such, the syntax for building the image for a single service is as follows:
+
+```shell
+make services/IMAGE_PATH/.target
+```
+
+`IMAGE_PATH` is the path to an image's context directory relative to `services/`; for example, `openedx/api` for the Analytics Data API image, and `hadoop/spark` for the Apache Spark image. So, for example, to build *only* the `hive-server` image, you would type:
+
+```shell
+make services/hadoop/hive-server/.target
+```
+
+For the sake of convenience, a rule is defined to allow a shorthand sytax for building individual images. The equivalent shorthand for the above command is:
+
+```shell
+make build.hadoop.hive-server
+```
+
+#### Command Reference
+
+When in doubt, to view a list of all available commands, simply execute `make` or:
+
+```shell
+make help
+```
+
+Below are example invocations of `Makefile` command. Where applicable, we use the `insights` service (or its image) as an example. All such commands also work for any other service. For example, anywhere you see `insights` (or `openedx.insights`), you could substitute `pipeline` (or `hadoop.pipeline`) in order to work with the `pipeline` service instead of the `insights` service.
+
+##### Build Commands
+
+Build any image(s) which have been modified since the last build (or which have not yet been built at all):
+
+```shell
+make build
+```
+
+Build a single image using its qualified name (the path to the image context relative to `services/` but with slashes replaced with dots):
+
+```shell
+make build.openedx.insights
+```
+
+Discard and recreate the `.target` files, then rebuild all images:
+
+```shell
+make force-rebuild
+```
+
+##### Initialization Commands
+
+Create all target files and initialize configuration files in the `conf/` directory:
+
+```shell
+make init
+```
+
+Format the HDFS NameNode prior to its first run (or after recreating its volume):
+
+```shell
+make format-namenode
+```
+
+##### Start Commands
+
+Bring up the core (openedx and web) stacks, then tail their log streams:
+
+```shell
+make up
+```
+
+Create the Hadoop services and run the update tasks:
+
+```shell
+make hadoop-tasks
+```
+
+Launch a single service along with its explicit dependencies (as determined by the `depends_on` field in `docker-compose.yml`) without bringing up the rest of the stack:
+
+```shell
+make start.insights
+```
+
+##### Stop Commands
+
+Stop and remove all running containers and networks:
+
+```shell
+make down
+```
+
+Stop and remove all running containers, networks, ⚠️AND VOLUMES⚠️ (this will delete ALL data, including HDFS, MySQL, and Elasticsearch data):
+
+⚠️⚠️⚠️
+```shell
+make destroy
+```
+⚠️⚠️⚠️
+
+##### Debugging Commands
+
+Attach an interactive shell session to the container of a running service:
+
+```shell
+make exec.insights
+```
+
+Create and attach to a new instance of a container for a service (does not need to be running). This is useful for debugging without needing to actually start the stack, or for debugging a failing service whose container is unstable (frequently erroring out and restarting):
+
+```shell
+make shell.insights
+```
+
+##### Misc Commands
+
+Follow the log stream(s) of all running services:
+
+```shell
+make logs
+```
+
+
